@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="run" name="ResourceLeakManager">
+    <target name="create_agent_jar">
+        <jar destfile="/home/shelajev/workspace/InstrumentationTest/target/resourceLeakAgent.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Premain-Class" value="com.example.instrumentation.ResourceLeakAgent" />
+                <attribute name="Can-Redefine-Classes" value="true" />
+                <attribute name="Can-Retransform-Classes" value="true" /> 
+                <attribute name="Boot-Class-Path" value="resourceLeakAgent.jar"/>
+            </manifest>
+            <fileset dir="bin"/>
+            <fileset dir="includeMe"/>
+        </jar>
+    </target>
+	
+	  <target name="run" depends="create_agent_jar">
+	  	<java fork="true" classname="com.example.instrumentation.main.MainTest" classpath="bin" >
+	  		<jvmarg id="javaagent" value="-javaagent:target/resourceLeakAgent.jar"/>
+	  	</java>
+	  </target>
+</project>
