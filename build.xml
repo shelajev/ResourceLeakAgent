@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="run" name="ResourceLeakManager">
-    <target name="create_agent_jar">
-        <jar destfile="/home/shelajev/workspace/InstrumentationTest/target/resourceLeakAgent.jar" filesetmanifest="mergewithoutmain">
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="target"/>
+
+  <target name="compile">
+    <mkdir dir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}" classpath="includeMe"/>
+  </target>
+
+    <target name="create_agent_jar" depends="compile">
+        <delete file="${dist}/resourceLeakAgent.jar"/>
+        <jar destfile="${dist}/resourceLeakAgent.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Premain-Class" value="com.example.instrumentation.ResourceLeakAgent" />
                 <attribute name="Can-Redefine-Classes" value="true" />
                 <attribute name="Can-Retransform-Classes" value="true" /> 
                 <attribute name="Boot-Class-Path" value="resourceLeakAgent.jar"/>
             </manifest>
-            <fileset dir="bin"/>
+            <fileset dir="${build}"/>
             <fileset dir="includeMe"/>
         </jar>
     </target>
 	
 	  <target name="run" depends="create_agent_jar">
-	  	<java fork="true" classname="com.example.instrumentation.main.MainTest" classpath="bin" >
-	  		<jvmarg id="javaagent" value="-javaagent:target/resourceLeakAgent.jar"/>
+	  	<java fork="true" classname="com.example.instrumentation.main.MainTest" classpath="${build}" >
+	  		<jvmarg id="javaagent" value="-javaagent:${dist}/resourceLeakAgent.jar"/>
 	  	</java>
 	  </target>
 </project>
